@@ -45,20 +45,16 @@ public class PlayerScript : MonoBehaviour
         //move player
         if (Input.GetKey(KeyCode.UpArrow))
         {
-            Vector3 force = ((transform.localRotation * Vector3.up)) * playerSpeed;
-            //rigidbody.AddForce(Vector3.up * playerSpeed);
-            rigidbody.AddForce(force);
+            rigidbody.AddForce(transform.localRotation * Vector3.up * playerSpeed);
         }
 
         if (Input.GetKey(KeyCode.RightArrow))
         {
-            //transform.Rotate(new Vector3(0, 0, -1) * turnSpeed);
             rigidbody.AddTorque(Vector3.back * turnSpeed);
         }
 
         if (Input.GetKey(KeyCode.LeftArrow))
         {
-            //transform.Rotate(new Vector3(0, 0, 1) * turnSpeed);
             rigidbody.AddTorque(Vector3.forward * turnSpeed);
         }
 
@@ -120,9 +116,6 @@ public class PlayerScript : MonoBehaviour
 	{
 		if (otherObject.gameObject.tag == "enemy")
 		{
-            //float temp = Random.Range(-6, 6);
-            //otherObject.transform.position = new Vector3(temp, 6, 0);
-
 			Transform tempExplosion;
 
 			tempExplosion = Instantiate(explosion, transform.position, transform.rotation) as Transform;

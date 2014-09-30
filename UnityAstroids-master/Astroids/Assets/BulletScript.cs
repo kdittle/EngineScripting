@@ -32,7 +32,7 @@ public class BulletScript : MonoBehaviour
 	{
 		if(otherObject.gameObject.tag == "enemy")
 		{
-			PlayerScript.playerScore += 100;
+			PlayerScript.playerScore += 200;
 
 			Transform tempExplosion;
 
@@ -40,5 +40,16 @@ public class BulletScript : MonoBehaviour
 
 			Destroy(gameObject);
 		}
+
+        if (otherObject.gameObject.tag == "asteroid")
+        {
+            PlayerScript.playerScore += 100;
+
+            Transform tempExplosion;
+
+            tempExplosion = Instantiate(explosion, transform.position, transform.rotation) as Transform;
+
+            Destroy(gameObject);
+        }
 	}
 }
