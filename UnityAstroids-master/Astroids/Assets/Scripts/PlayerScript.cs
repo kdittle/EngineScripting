@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿
+using UnityEngine;
 using System.Collections;
 
 public class PlayerScript : MonoBehaviour 
@@ -13,11 +14,17 @@ public class PlayerScript : MonoBehaviour
 
 	public Transform explosion;
 
+    private Transform child;
+
 	// Use this for initialization
 	void Start () 
 	{
 		playerLives = 3;
 		playerScore = 0;
+        child = transform.GetChild(0);
+	    child.renderer.enabled = false;
+
+
 	}
 	
 	// Update is called once per frame
@@ -46,6 +53,11 @@ public class PlayerScript : MonoBehaviour
         if (Input.GetKey(KeyCode.UpArrow))
         {
             rigidbody.AddForce(transform.localRotation * Vector3.up * playerSpeed);
+            child.renderer.enabled = true;
+        }
+        else
+        {
+            child.renderer.enabled = false;
         }
 
         if (Input.GetKey(KeyCode.RightArrow))
@@ -102,15 +114,6 @@ public class PlayerScript : MonoBehaviour
         }
     }
 
-    //Dispaly for score, lives, and enemies
-	void OnGUI()
-	{
-		GUI.Label (new Rect (10, 10, 200, 50), "Score: " + playerScore);
-
-		GUI.Label (new Rect (10, 30, 200, 50), "Lives: " + playerLives);
-		GUI.Label (new Rect (10, 50, 200, 50), "Enemies: " + EnemyScript.numEnemies);
-	}
-
     //Collision between player and enemies
 	void OnTriggerEnter(Collider otherObject)
 	{
@@ -120,7 +123,20 @@ public class PlayerScript : MonoBehaviour
 
 			tempExplosion = Instantiate(explosion, transform.position, transform.rotation) as Transform;
 
+            Destroy(this.gameObject);
+
 			playerLives--;
 		}
+
+	    if (otherObject.gameObject.tag == "asteroid")
+	    {
+	        Transform tempExplosion;
+
+	        tempExplosion = Instantiate(explosion, transform.position, transform.rotation) as Transform;
+            
+            Destroy(this.gameObject);
+
+	        playerLives--;
+	    }
 	}
 }
