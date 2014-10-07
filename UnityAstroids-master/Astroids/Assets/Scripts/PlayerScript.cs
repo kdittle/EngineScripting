@@ -7,6 +7,7 @@ public class PlayerScript : MonoBehaviour
 	public float playerSpeed;
 	public float turnSpeed;
 	public static int playerLives;
+    public static bool isAlive;
 
 	public static int playerScore = 0;
 
@@ -16,15 +17,16 @@ public class PlayerScript : MonoBehaviour
 
     private Transform child;
 
+    private Vector3 newPosition;
+
 	// Use this for initialization
 	void Start () 
 	{
 		playerLives = 3;
 		playerScore = 0;
-        child = transform.GetChild(0);
+	    child = transform.GetChild(1);
 	    child.renderer.enabled = false;
-
-
+	    isAlive = true;
 	}
 	
 	// Update is called once per frame
@@ -52,7 +54,7 @@ public class PlayerScript : MonoBehaviour
         //move player
         if (Input.GetKey(KeyCode.UpArrow))
         {
-            rigidbody.AddForce(transform.localRotation * Vector3.up * playerSpeed);
+            rigidbody2D.AddRelativeForce(Vector2.up * playerSpeed, ForceMode2D.Force);
             child.renderer.enabled = true;
         }
         else
@@ -62,19 +64,19 @@ public class PlayerScript : MonoBehaviour
 
         if (Input.GetKey(KeyCode.RightArrow))
         {
-            rigidbody.AddTorque(Vector3.back * turnSpeed);
+            rigidbody2D.AddTorque(1.0f * -turnSpeed, ForceMode2D.Force);
         }
 
         if (Input.GetKey(KeyCode.LeftArrow))
         {
-            rigidbody.AddTorque(Vector3.forward * turnSpeed);
+            rigidbody2D.AddTorque(1.0f * turnSpeed, ForceMode2D.Force);
         }
 
         //Fire bullets
         if (Input.GetKeyDown(KeyCode.Space))
         {
-            Rigidbody tempBullet;
-            tempBullet = Instantiate(bullet, transform.position, transform.rotation) as Rigidbody;
+            //Rigidbody tempBullet;
+            //tempBullet = Instantiate(bullet, transform.position, transform.rotation) as Rigidbody;
         }
 
     }
@@ -84,7 +86,7 @@ public class PlayerScript : MonoBehaviour
         //Check if player has gone too high, move him to the bottom
         if (transform.position.y > 12.5)
         {
-            Vector3 newPosition = new Vector3(0, -12.5f, 0);
+            newPosition = new Vector3(0, -12.5f, 0);
 
             transform.position = newPosition;
         }
@@ -92,7 +94,7 @@ public class PlayerScript : MonoBehaviour
         //Check if player has gone too low, move him to top
         if (transform.position.y < -12.5)
         {
-            Vector3 newPosition = new Vector3(0, 12.5f, 0);
+            newPosition = new Vector3(0, 12.5f, 0);
 
             transform.position = newPosition;
         }
@@ -100,7 +102,7 @@ public class PlayerScript : MonoBehaviour
         //Check if player has gone too far right, move him to left
         if (transform.position.x > 25)
         {
-            Vector3 newPosition = new Vector3(-25.0f, 0, 0);
+            newPosition = new Vector3(-25.0f, 0, 0);
 
             transform.position = newPosition;
         }
@@ -108,7 +110,7 @@ public class PlayerScript : MonoBehaviour
         //Check if player has gone too far left, move him to the right
         if (transform.position.x < -25.0)
         {
-            Vector3 newPosition = new Vector3(25.0f, 0, 0);
+            newPosition = new Vector3(25.0f, 0, 0);
 
             transform.position = newPosition;
         }
@@ -126,6 +128,7 @@ public class PlayerScript : MonoBehaviour
             Destroy(this.gameObject);
 
 			playerLives--;
+		    isAlive = false;
 		}
 
 	    if (otherObject.gameObject.tag == "asteroid")
@@ -137,6 +140,7 @@ public class PlayerScript : MonoBehaviour
             Destroy(this.gameObject);
 
 	        playerLives--;
+	        isAlive = false;
 	    }
 	}
 }
