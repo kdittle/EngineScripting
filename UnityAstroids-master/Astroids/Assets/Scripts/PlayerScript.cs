@@ -1,4 +1,5 @@
 ﻿
+using UnityEditor;
 using UnityEngine;
 using System.Collections;
 
@@ -11,30 +12,63 @@ public class PlayerScript : MonoBehaviour
 
 	public static int playerScore = 0;
 
-	public Rigidbody bullet;
+	public Rigidbody2D bullet;
 
 	public Transform explosion;
 
-    private Transform child;
-
     private Vector3 newPosition;
+
+    private Transform fireLocation;
+    private Transform thruster;
+
+    private Renderer[] renderers;
+    private bool isWrappingX = false;
+    private bool isWrappingY = false;
+    private Vector3 ScreenBottomLeft;
+    private Vector3 ScreenTopRight;
+    private float screenWidth;
+    private float screenHeight;
+    private Camera cam;
+
+    private Transform[] ghosts = new Transform[8];
 
 	// Use this for initialization
 	void Start () 
 	{
 		playerLives = 3;
 		playerScore = 0;
-	    child = transform.GetChild(1);
-	    child.renderer.enabled = false;
+	    thruster = transform.FindChild("ShipThruster");
+	    thruster.renderer.enabled = false;
+	    fireLocation = transform.FindChild("FireLocation");
 	    isAlive = true;
+
+	    renderers = GetComponentsInChildren<Renderer>();
+
+        //get main camera
+	    cam = Camera.main;
+
+        //screen bottom left
+	    ScreenBottomLeft = cam.ViewportToWorldPoint(new Vector3(0, 0, transform.position.z));
+
+        //screen top right
+	    ScreenTopRight = cam.ViewportToWorldPoint(new Vector3(1, 1, transform.position.z));
+
+        //get screen width and height
+	    screenWidth = ScreenTopRight.x - ScreenBottomLeft.x;
+	    screenHeight = ScreenTopRight.y - ScreenBottomLeft.y;
+
+        //create ghost ships
+        CreatGhostShips();
 	}
 	
 	// Update is called once per frame
 	void Update ()
 	{
+        //Handle input
 	    HandlePlayerInput();
 
-	    CheckForWrap();
+        //Swap ships for wrapping
+        SwapShips();
 
         //Win/Lose conditions
 		if(playerScore >= 2500)
@@ -49,17 +83,31 @@ public class PlayerScript : MonoBehaviour
 
 	}
 
+    //Check if there are renderers in renderers
+    bool CheckRenderers()
+    {
+        foreach (Renderer renderer in renderers)
+        {
+            if (renderer.isVisible)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     private void HandlePlayerInput()
     {
         //move player
         if (Input.GetKey(KeyCode.UpArrow))
         {
             rigidbody2D.AddRelativeForce(Vector2.up * playerSpeed, ForceMode2D.Force);
-            child.renderer.enabled = true;
+            thruster.renderer.enabled = true;
         }
         else
         {
-            child.renderer.enabled = false;
+            thruster.renderer.enabled = false;
         }
 
         if (Input.GetKey(KeyCode.RightArrow))
@@ -75,45 +123,92 @@ public class PlayerScript : MonoBehaviour
         //Fire bullets
         if (Input.GetKeyDown(KeyCode.Space))
         {
-            //Rigidbody tempBullet;
-            //tempBullet = Instantiate(bullet, transform.position, transform.rotation) as Rigidbody;
+            Rigidbody2D tempBullet;
+            tempBullet = Instantiate(bullet, fireLocation.position, fireLocation.rotation) as Rigidbody2D;
         }
 
     }
 
-    private void CheckForWrap()
+    //Create ghost ships for wrapping
+    void CreatGhostShips()
     {
-        //Check if player has gone too high, move him to the bottom
-        if (transform.position.y > 12.5)
+        for (int i = 0; i < 8; i++)
         {
-            newPosition = new Vector3(0, -12.5f, 0);
+            ghosts[i] = Instantiate(transform, Vector3.zero, Quaternion.identity) as Transform;
 
-            transform.position = newPosition;
+            if (ghosts[i] != null) 
+                DestroyImmediate(ghosts[i], true);
+        }
+    }
+
+    //positions the ghost ships for wrapping
+    void PositionGhostShips()
+    {
+        Vector3 ghostPosition = transform.position;
+
+        //position ghosts clockwaise behind the edges of the screen
+
+        //far right
+        ghostPosition.x = transform.position.x + screenWidth;
+        ghostPosition.y = transform.position.y;
+        ghosts[0].position = ghostPosition;
+
+        //bottom right
+        ghostPosition.x = transform.position.x + screenWidth;
+        ghostPosition.y = transform.position.y - screenHeight;
+        ghosts[1].position = ghostPosition;
+
+        //bottom
+        ghostPosition.x = transform.position.x;
+        ghostPosition.y = transform.position.y - screenHeight;
+        ghosts[2].position = ghostPosition;
+
+        // Bottom-left
+        ghostPosition.x = transform.position.x - screenWidth;
+        ghostPosition.y = transform.position.y - screenHeight;
+        ghosts[3].position = ghostPosition;
+
+        // Left
+        ghostPosition.x = transform.position.x - screenWidth;
+        ghostPosition.y = transform.position.y;
+        ghosts[4].position = ghostPosition;
+
+        // Top-left
+        ghostPosition.x = transform.position.x - screenWidth;
+        ghostPosition.y = transform.position.y + screenHeight;
+        ghosts[5].position = ghostPosition;
+
+        // Top
+        ghostPosition.x = transform.position.x;
+        ghostPosition.y = transform.position.y + screenHeight;
+        ghosts[6].position = ghostPosition;
+
+        // Top-right
+        ghostPosition.x = transform.position.x + screenWidth;
+        ghostPosition.y = transform.position.y + screenHeight;
+        ghosts[7].position = ghostPosition;
+
+        // All ghost ships should have the same rotation as the main ship
+        for (int i = 0; i < 8; i++)
+        {
+            ghosts[i].rotation = transform.rotation;
+        }
+    }
+
+    //Swap ghost ships for wrapping
+    void SwapShips()
+    {
+        foreach (Transform ghost in ghosts)
+        {
+            if (ghost.position.x < screenWidth && ghost.position.x > -screenWidth &&
+                ghost.position.y < screenHeight && ghost.position.y > -screenHeight)
+            {
+                transform.position = ghost.position;
+                break;
+            }
         }
 
-        //Check if player has gone too low, move him to top
-        if (transform.position.y < -12.5)
-        {
-            newPosition = new Vector3(0, 12.5f, 0);
-
-            transform.position = newPosition;
-        }
-
-        //Check if player has gone too far right, move him to left
-        if (transform.position.x > 25)
-        {
-            newPosition = new Vector3(-25.0f, 0, 0);
-
-            transform.position = newPosition;
-        }
-
-        //Check if player has gone too far left, move him to the right
-        if (transform.position.x < -25.0)
-        {
-            newPosition = new Vector3(25.0f, 0, 0);
-
-            transform.position = newPosition;
-        }
+        PositionGhostShips();
     }
 
     //Collision between player and enemies
