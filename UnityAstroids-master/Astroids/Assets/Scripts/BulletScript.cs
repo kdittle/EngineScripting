@@ -6,6 +6,7 @@ public class BulletScript : MonoBehaviour
 	public float bulletSpeed;
 
 	public Transform explosion;
+    public Rigidbody2D bullet;
 
 	// Use this for initialization
 	void Start () 
@@ -16,16 +17,10 @@ public class BulletScript : MonoBehaviour
 	// Update is called once per frame
 	void Update () 
 	{
-		//move bullet
-		float amtToMove = bulletSpeed * Time.deltaTime;
-
-		transform.Translate (Vector3.up * amtToMove);
-
-		if (transform.position.y >= 12 || transform.position.y <= -12 
-            || transform.position.x >= 23 || transform.position.x <= -23)
-		{
-			Destroy(gameObject);
-		}
+	    if (Input.GetKeyDown(KeyCode.Space))
+	    {
+	        Rigidbody2D newBullet = Instantiate(bullet, transform.position, transform.rotation) as Rigidbody2D;
+	    }
 	}
 
 	void OnTriggerEnter(Collider otherObject)
