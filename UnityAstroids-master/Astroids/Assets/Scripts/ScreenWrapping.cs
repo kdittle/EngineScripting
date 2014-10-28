@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class ScreenWrapping : MonoBehaviour 
+public class ScreenWrapping : MonoBehaviour
 {
     private Renderer[] renderers;
     //private bool isWrappingX = false;
@@ -65,8 +65,12 @@ public class ScreenWrapping : MonoBehaviour
             if (this.transform != null)
             {
                 ghosts[i] = Instantiate(transform, Vector3.zero, Quaternion.identity) as Transform;
-                DestroyImmediate(ghosts[i].GetComponent<ScreenWrapping>());
-                DestroyImmediate(ghosts[i].GetComponent<BulletScript>());
+
+                if (ghosts[i].transform != null)
+                {
+                    DestroyImmediate(ghosts[i].GetComponent<ScreenWrapping>(), true);
+                    //DestroyImmediate(ghosts[i].GetComponentInChildren<BulletScript>());
+                }
             }
         }
     }
