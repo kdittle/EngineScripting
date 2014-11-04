@@ -5,7 +5,8 @@ using System.Collections.Generic;
 public class EnemyScript : MonoBehaviour 
 {
 	public Transform target;
-    public Rigidbody bullet;
+    public Rigidbody2D bullet;
+    public Transform explosion;
 
     public float enemySpeed;
 
@@ -70,6 +71,21 @@ public class EnemyScript : MonoBehaviour
             Vector3 newPosition = new Vector3(25.0f, 0, 0);
 
             transform.position = newPosition;
+        }
+    }
+
+    void OnTriggerEnter2D(Collider2D otherObject)
+    {
+        if (otherObject.gameObject.tag == "bullet")
+        {
+            PlayerScript.playerScore += 100;
+
+            Transform tempExplosion;
+
+            tempExplosion = Instantiate(explosion, transform.position, transform.rotation) as Transform;
+
+            Destroy(otherObject.gameObject);
+            Destroy(gameObject);
         }
     }
 

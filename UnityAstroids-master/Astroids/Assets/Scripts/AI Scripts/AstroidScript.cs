@@ -4,6 +4,8 @@ using System.Collections.Generic;
 
 public class AstroidScript : MonoBehaviour
 {
+    public Transform explosion;
+
     public GameObject[] AsteroidObjects = new GameObject[3]; 
 
     private Vector2 spawnPosition;
@@ -28,4 +30,19 @@ public class AstroidScript : MonoBehaviour
 	    
 	}
 
+    void OnTriggerEnter2D(Collider2D otherObject)
+    {
+        if (otherObject.gameObject.tag == "bullet")
+        {
+            PlayerScript.playerScore += 100;
+
+            Transform tempExplosion;
+
+            tempExplosion = Instantiate(explosion, transform.position, transform.rotation) as Transform;
+
+            Destroy(otherObject.gameObject);
+            Destroy(gameObject);
+
+        }
+    }
 }

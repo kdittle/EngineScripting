@@ -1,4 +1,5 @@
 ﻿
+using System;
 using UnityEditor;
 using UnityEngine;
 using System.Collections;
@@ -50,7 +51,7 @@ public class PlayerScript : MonoBehaviour
     private void HandlePlayerInput()
     {
         //move player
-        if (Input.GetKey(KeyCode.UpArrow))
+        if (Input.GetKey(KeyCode.UpArrow) || Input.GetKey(KeyCode.W))
         {
             rigidbody2D.AddRelativeForce(Vector2.up * playerSpeed, ForceMode2D.Force);
             thruster.renderer.enabled = true;
@@ -60,12 +61,12 @@ public class PlayerScript : MonoBehaviour
             thruster.renderer.enabled = false;
         }
 
-        if (Input.GetKey(KeyCode.RightArrow))
+        if (Input.GetKey(KeyCode.RightArrow) || Input.GetKey(KeyCode.D))
         {
             rigidbody2D.AddTorque(1.0f * -turnSpeed, ForceMode2D.Force);
         }
 
-        if (Input.GetKey(KeyCode.LeftArrow))
+        if (Input.GetKey(KeyCode.LeftArrow) || Input.GetKey(KeyCode.A))
         {
             rigidbody2D.AddTorque(1.0f * turnSpeed, ForceMode2D.Force);
         }
@@ -73,30 +74,33 @@ public class PlayerScript : MonoBehaviour
     }
 
     //Collision between player and enemies
-	void OnTriggerEnter(Collider otherObject)
-	{
-		if (otherObject.gameObject.tag == "enemy")
-		{
-			Transform tempExplosion;
+    void OnTriggerEnter2D(Collider2D otherObject)
+    {
+        if (otherObject.gameObject.tag == "enemy")
+        {
+            Transform tempExplosion;
 
-			tempExplosion = Instantiate(explosion, transform.position, transform.rotation) as Transform;
+            tempExplosion = Instantiate(explosion, transform.position, transform.rotation) as Transform;
 
+            Destroy(otherObject.gameObject);
             Destroy(this.gameObject);
 
-			playerLives--;
-		    isAlive = false;
-		}
+            playerLives--;
+            isAlive = false;
+        }
 
-	    if (otherObject.gameObject.tag == "asteroid")
-	    {
-	        Transform tempExplosion;
+        if (otherObject.gameObject.tag == "asteroid")
+        {
+            Transform tempExplosion;
 
-	        tempExplosion = Instantiate(explosion, transform.position, transform.rotation) as Transform;
-            
+            tempExplosion = Instantiate(explosion, transform.position, transform.rotation) as Transform;
+
+            Destroy(otherObject.gameObject);
             Destroy(this.gameObject);
 
-	        playerLives--;
-	        isAlive = false;
-	    }
-	}
+            playerLives--;
+            isAlive = false;
+        }
+    }
+
 }
