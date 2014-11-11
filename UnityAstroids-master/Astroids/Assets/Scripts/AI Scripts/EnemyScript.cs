@@ -74,7 +74,7 @@ public class EnemyScript : MonoBehaviour
         }
     }
 
-    void OnTriggerEnter2D(Collider2D otherObject)
+    void OnCollisionEnter2D(Collision2D otherObject)
     {
         if (otherObject.gameObject.tag == "bullet")
         {

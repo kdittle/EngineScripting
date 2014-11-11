@@ -1,11 +1,13 @@
-﻿
-using System;
+﻿using System;
 using UnityEditor;
 using UnityEngine;
 using System.Collections;
 
 public class PlayerScript : MonoBehaviour 
 {
+    public GameObject gameManager;
+    public GameManagerScript gmScript;
+
 	public float playerSpeed;
 	public float turnSpeed;
 	public static int playerLives;
@@ -17,9 +19,35 @@ public class PlayerScript : MonoBehaviour
 
     private Transform thruster;
 
+    //Try and find the game manager
+    void Awake()
+    {
+        try
+        {
+            gmScript = GameObject.FindGameObjectWithTag("Game Manager").GetComponent<GameManagerScript>();
+        }
+        catch (Exception e)
+        {
+            Debug.LogException(e, this);
+        }
+    }
+
 	// Use this for initialization
 	void Start () 
 	{
+        //find or create the game manager!
+        if (gmScript == null)
+        {
+            Debug.Log("There is no Game Manager");
+            Debug.Log("Creating Game Manager");
+            Instantiate(gameManager);
+
+        }
+        else
+        {
+            Debug.Log("Game Manager found.");
+        }
+
 		playerLives = 3;
 		playerScore = 0;
 	    thruster = transform.FindChild("ShipThruster");
@@ -74,7 +102,7 @@ public class PlayerScript : MonoBehaviour
     }
 
     //Collision between player and enemies
-    void OnTriggerEnter2D(Collider2D otherObject)
+    void OnCollisionEnter2D(Collision2D otherObject)
     {
         if (otherObject.gameObject.tag == "enemy")
         {
