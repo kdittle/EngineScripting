@@ -104,6 +104,8 @@ public class PlayerScript : MonoBehaviour
     //Collision between player and enemies
     void OnCollisionEnter2D(Collision2D otherObject)
     {
+        Debug.Log("Collision Registered");
+
         if (otherObject.gameObject.tag == "enemy")
         {
             Transform tempExplosion;

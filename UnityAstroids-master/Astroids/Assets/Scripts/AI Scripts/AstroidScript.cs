@@ -16,14 +16,9 @@ public class AstroidScript : MonoBehaviour
     private Vector2 spawnPosition;
     private Vector2 velocity;
 
-    private float minScale = 1.0f;
-    private float maxScale = 3.0f;
-
-    private bool _firstSpawn = true;
-    private bool _secondSpawn = false;
-    private bool _thirdSpaw = false;
-
     private float numAsteroids = 2;
+
+    private Transform tempObject;
 
     void Awake()
     {
@@ -52,12 +47,12 @@ public class AstroidScript : MonoBehaviour
             Debug.Log("Game Manager found.");
         }
     }
-	
-	// Update is called once per frame
-	void FixedUpdate () 
+
+    // Update is called once per frame
+    void FixedUpdate()
     {
-	    
-	}
+
+    }
 
     void OnCollisionEnter2D(Collision2D otherObject)
     {
@@ -72,8 +67,12 @@ public class AstroidScript : MonoBehaviour
             Destroy(otherObject.gameObject);
             Destroy(gameObject);
 
-
-
+            tempObject = Instantiate(transform, transform.position, transform.rotation) as Transform;
+            tempObject.localScale = new Vector3(2.0f, 2.0f, 1.0f);
+            tempObject.gameObject.collider2D.enabled = true;
+            tempObject = Instantiate(transform, transform.position + new Vector3(1, 1, 1), transform.rotation) as Transform;
+            tempObject.localScale = new Vector3(2.0f, 2.0f, 1.0f);
+            tempObject.gameObject.collider2D.enabled = true;
         }
     }
 }
