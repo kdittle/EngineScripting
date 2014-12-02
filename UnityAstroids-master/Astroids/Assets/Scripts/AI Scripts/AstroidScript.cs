@@ -1,5 +1,4 @@
-﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -9,43 +8,31 @@ public class AstroidScript : MonoBehaviour
 
     public GameObject[] AsteroidObjects = new GameObject[3];
 
+    public float minTorque = 10.0f;
+    public float maxTorque = 50.0f;
 
-    public GameObject gameManager;
-    public GameManagerScript gmScript;
-
-    private Vector2 spawnPosition;
-    private Vector2 velocity;
-
-    private float numAsteroids = 2;
+    public float minForce = 10.0f;
+    public float maxForce = 15.0f;
 
     private Transform tempObject;
 
-    void Awake()
-    {
-        try
-        {
-            gmScript = GameObject.FindGameObjectWithTag("Game Manager").GetComponent<GameManagerScript>();
-        }
-        catch (Exception e)
-        {
-            Debug.LogException(e, this);
-        }
-    }
+    private Vector2 velocity;
+    private float x, y;
+    float magnitude;
 
     // Use this for initialization
     void Start()
     {
-        if (gmScript == null)
-        {
-            Debug.Log("There is no Game Manager");
-            Debug.Log("Creating Game Manager");
-            Instantiate(gameManager);
+        magnitude = Random.Range(minForce, maxForce);
 
-        }
-        else
-        {
-            Debug.Log("Game Manager found.");
-        }
+        x = Random.Range(-1.0f, 1.0f);
+        y = Random.Range(-1.0f, 1.0f);
+
+        rigidbody2D.AddForce(new Vector2(x, y) * magnitude);
+
+
+        rigidbody2D.AddTorque(Random.Range(minTorque, maxTorque));
+
     }
 
     // Update is called once per frame
@@ -68,11 +55,16 @@ public class AstroidScript : MonoBehaviour
             Destroy(gameObject);
 
             tempObject = Instantiate(transform, transform.position, transform.rotation) as Transform;
-            tempObject.localScale = new Vector3(2.0f, 2.0f, 1.0f);
+            tempObject.localScale = new Vector3(3.0f, 3.0f, 1.0f);
             tempObject.gameObject.collider2D.enabled = true;
+            tempObject.rigidbody2D.AddForce(new Vector2(x, y) * magnitude);
+            rigidbody2D.AddTorque(Random.Range(minTorque, maxTorque));
+
             tempObject = Instantiate(transform, transform.position + new Vector3(1, 1, 1), transform.rotation) as Transform;
-            tempObject.localScale = new Vector3(2.0f, 2.0f, 1.0f);
+            tempObject.localScale = new Vector3(3.0f, 3.0f, 1.0f);
             tempObject.gameObject.collider2D.enabled = true;
+            tempObject.rigidbody2D.AddForce(new Vector2(x, y) * magnitude);
+            rigidbody2D.AddTorque(Random.Range(minTorque, maxTorque));
         }
     }
 }

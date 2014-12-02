@@ -7,9 +7,10 @@ public class BulletController : MonoBehaviour
 {
 
     public float speed;
-    public float bulletLifeTime;
 
-    private float curBulLife;
+    public float destroyOffset = 40.0f;
+
+    private Vector2 initialPosition;
 
     void Awake()
     {
@@ -19,7 +20,7 @@ public class BulletController : MonoBehaviour
 	// Use this for initialization
 	void Start ()
 	{
-
+        initialPosition = transform.position;
 	}
 	
 	// Update is called once per frame
@@ -27,12 +28,10 @@ public class BulletController : MonoBehaviour
     {
 	    transform.Translate(Vector3.up * speed * Time.deltaTime);
 
-	    curBulLife = Time.deltaTime;
+        if(Vector2.Distance(initialPosition, transform.position) > destroyOffset)
+        {
+            Destroy(gameObject);
+        }
 
-	    if (curBulLife >= bulletLifeTime)
-	    {
-	        Destroy(transform.gameObject);
-	        curBulLife = 0;
-	    }
     }
 }
