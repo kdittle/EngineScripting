@@ -11,23 +11,34 @@ public class GameManagerScript : MonoBehaviour
     public GameObject PlayerSpawnObject;
     public GameObject AsteroidSpawnObject;
 
+    private bool _spawnSafe;
+    private bool _isPlayerDead;
+
 	// Use this for initialization
 	void Start () 
     {
         DontDestroyOnLoad(gameObject);
+        PlayerObject.GetComponent<PlayerScript>().ResetPlayer();
+        _isPlayerDead = false;
+
 	}
 	
 	// Update is called once per frame
 	void FixedUpdate () 
     {
 
+        if(_isPlayerDead && PlayerSpawnObject.GetComponent<PlayerSpawnScript>().CheckSpawnStatus())
+        {
+            RespawnPlayer();
+        }
+
         //Win/Lose conditions
-        if (PlayerObject.GetComponent<PlayerScript>().playerScore >= PointsToWin)
+        if (PlayerObject.GetComponent<PlayerScript>().GetPlayerScore() >= PointsToWin)
         {
             Application.LoadLevel(3);
         }
 
-        if ((PlayerObject.GetComponent<PlayerScript>().playerLives <= 0))
+        if ((PlayerObject.GetComponent<PlayerScript>().GetPlayerLives() <= 0))
         {
             Application.LoadLevel(2);
         }
@@ -37,19 +48,26 @@ public class GameManagerScript : MonoBehaviour
     {
         if(!isPlayerAlive)
         {
-            PlayerObject.GetComponent<PlayerScript>().playerLives--;
+            _isPlayerDead = true;
+            PlayerObject.GetComponent<PlayerScript>().RemovePlayerLife();
         }
     }
 
     public void UpdatePlayerScore(int scoreToAdd)
     {
-        PlayerObject.GetComponent<PlayerScript>().playerScore += 100;
+        PlayerObject.GetComponent<PlayerScript>().AddToScore(scoreToAdd);
+    }
+
+    public void RespawnPlayer()
+    {
+        Instantiate(PlayerObject);
+        _isPlayerDead = false;
     }
 
     void OnGUI()
     {
-        GUI.Label(new Rect(10, 10, 200, 50), "Score: " + PlayerObject.GetComponent<PlayerScript>().playerScore);
+        GUI.Label(new Rect(10, 10, 200, 50), "Score: " + PlayerObject.GetComponent<PlayerScript>().GetPlayerScore());
 
-        GUI.Label(new Rect(10, 30, 200, 50), "Lives: " + PlayerObject.GetComponent<PlayerScript>().playerLives);
+        GUI.Label(new Rect(10, 30, 200, 50), "Lives: " + PlayerObject.GetComponent<PlayerScript>().GetPlayerLives());
     }
 }

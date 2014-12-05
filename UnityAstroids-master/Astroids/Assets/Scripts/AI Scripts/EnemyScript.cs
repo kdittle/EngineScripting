@@ -30,11 +30,20 @@ public class EnemyScript : MonoBehaviour
     {
         if (otherObject.gameObject.tag == "bullet")
         {
-            GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerScript>().playerScore += 100;
+            GameObject.FindGameObjectWithTag("Game Manager").SendMessage("UpdatePlayerScore", 100);
 
             Instantiate(explosion, transform.position, transform.rotation);
 
             Destroy(otherObject.gameObject);
+            Destroy(gameObject);
+        }
+
+        if (otherObject.gameObject.tag == "asteroid")
+        {
+            GameObject.FindGameObjectWithTag("Game Manager").SendMessage("UpdatePlayerScore", 100);
+
+            Instantiate(explosion, transform.position, transform.rotation);
+
             Destroy(gameObject);
         }
     }

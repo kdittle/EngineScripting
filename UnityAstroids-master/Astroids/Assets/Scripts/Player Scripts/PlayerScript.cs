@@ -7,16 +7,13 @@ public class PlayerScript : MonoBehaviour
 {
     public GameObject gameManager;
     public GameManagerScript gmScript;
-
+    public Transform explosion;
 	public float playerSpeed;
 	public float turnSpeed;
-	public int playerLives;
-    public bool isAlive;
 
-	public int playerScore = 0;
-
-	public Transform explosion;
-
+	private int playerLives;
+    private bool isAlive;
+	private int playerScore = 0;
     private Transform thruster;
 
     //Try and find the game manager
@@ -55,6 +52,11 @@ public class PlayerScript : MonoBehaviour
             Debug.Log("Game Manager found.");
         }
 
+        playerLives = 3;
+        playerScore = 0;
+        thruster = transform.FindChild("ShipThruster");
+        thruster.renderer.enabled = false;
+        isAlive = true;
 	    
 	}
 	
@@ -96,6 +98,32 @@ public class PlayerScript : MonoBehaviour
         GameObject.FindGameObjectWithTag("Game Manager").SendMessage("CheckPlayerStatus", isAlive);
     }
 
+    public int GetPlayerScore()
+    {
+        return playerScore;
+    }
+
+    public int GetPlayerLives()
+    {
+        return playerLives;
+    }
+
+    public void RemovePlayerLife()
+    {
+        playerLives--;
+    }
+
+    public void AddToScore(int scoreToAdd)
+    {
+        playerScore += scoreToAdd;
+    }
+
+    public void ResetPlayer()
+    {
+        playerScore = 0;
+        playerLives = 3;
+    }
+
     //Collision between player and enemies
     void OnCollisionEnter2D(Collision2D otherObject)
     {
@@ -103,9 +131,9 @@ public class PlayerScript : MonoBehaviour
         {
             Instantiate(explosion, transform.position, transform.rotation);
 
-            Destroy(this.gameObject);
+            Destroy(gameObject);
+            Destroy(otherObject.gameObject);
 
-            //playerLives--;
             isAlive = false;
             UpdatePlayerStatus();
         }
@@ -114,9 +142,8 @@ public class PlayerScript : MonoBehaviour
         {
             Instantiate(explosion, transform.position, transform.rotation);
 
-            Destroy(this.gameObject);
+            Destroy(gameObject);
 
-            //playerLives--;
             isAlive = false;
             UpdatePlayerStatus();
         }
