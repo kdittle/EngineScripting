@@ -5,8 +5,7 @@ using System.Collections.Generic;
 public class EnemyScript : MonoBehaviour 
 {
 	public Transform target;
-    public Rigidbody2D bullet;
-    public Transform explosion;
+    public Rigidbody bullet;
 
     public float enemySpeed;
 
@@ -35,7 +34,8 @@ public class EnemyScript : MonoBehaviour
 
     private void ShootAtPlayer()
     {
-        Instantiate(bullet, transform.position, target.transform.rotation);
+        Rigidbody tempBullet;
+        tempBullet = Instantiate(bullet, transform.position, target.transform.rotation) as Rigidbody;
     }
 
     private void CheckForWrap()
@@ -70,19 +70,6 @@ public class EnemyScript : MonoBehaviour
             Vector3 newPosition = new Vector3(25.0f, 0, 0);
 
             transform.position = newPosition;
-        }
-    }
-
-    void OnCollisionEnter2D(Collision2D otherObject)
-    {
-        if (otherObject.gameObject.tag == "bullet")
-        {
-            PlayerScript.playerScore += 100;
-
-            Instantiate(explosion, transform.position, transform.rotation);
-
-            Destroy(otherObject.gameObject);
-            Destroy(gameObject);
         }
     }
 

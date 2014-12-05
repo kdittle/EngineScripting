@@ -19,7 +19,7 @@ public class BulletScript : MonoBehaviour
 	{
 	    if (Input.GetKeyDown(KeyCode.Space))
 	    {
-	        Rigidbody2D newBullet = Instantiate(bullet, transform.position, transform.rotation) as Rigidbody2D;
+	        Instantiate(bullet, transform.position, transform.rotation);
 	    }
 	}
 }

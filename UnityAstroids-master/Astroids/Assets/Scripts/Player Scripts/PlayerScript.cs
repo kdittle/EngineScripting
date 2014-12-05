@@ -63,17 +63,6 @@ public class PlayerScript : MonoBehaviour
         //Handle input
 	    HandlePlayerInput();
 
-        //Win/Lose conditions
-		if(playerScore >= 2500)
-		{
-			Application.LoadLevel(3);
-		}
-
-		if(playerLives <= 0)
-		{
-			Application.LoadLevel(2);
-		}
-
 	}
 
     private void HandlePlayerInput()
@@ -104,15 +93,10 @@ public class PlayerScript : MonoBehaviour
     //Collision between player and enemies
     void OnCollisionEnter2D(Collision2D otherObject)
     {
-        Debug.Log("Collision Registered");
-
         if (otherObject.gameObject.tag == "enemy")
         {
-            Transform tempExplosion;
+            Instantiate(explosion, transform.position, transform.rotation);
 
-            tempExplosion = Instantiate(explosion, transform.position, transform.rotation) as Transform;
-
-            Destroy(otherObject.gameObject);
             Destroy(this.gameObject);
 
             playerLives--;
@@ -121,11 +105,8 @@ public class PlayerScript : MonoBehaviour
 
         if (otherObject.gameObject.tag == "asteroid")
         {
-            Transform tempExplosion;
+            Instantiate(explosion, transform.position, transform.rotation);
 
-            tempExplosion = Instantiate(explosion, transform.position, transform.rotation) as Transform;
-
-            Destroy(otherObject.gameObject);
             Destroy(this.gameObject);
 
             playerLives--;

@@ -6,7 +6,8 @@ public class AstroidScript : MonoBehaviour
 {
     public Transform explosion;
 
-    public GameObject[] AsteroidObjects = new GameObject[3];
+    public GameObject childAsteroid;
+    public int numChildren = 2;
 
     public float minTorque = 10.0f;
     public float maxTorque = 50.0f;
@@ -47,24 +48,22 @@ public class AstroidScript : MonoBehaviour
         {
             PlayerScript.playerScore += 100;
 
-            Transform tempExplosion;
-
-            tempExplosion = Instantiate(explosion, transform.position, transform.rotation) as Transform;
+            Instantiate(explosion, transform.position, transform.rotation);
 
             Destroy(otherObject.gameObject);
             Destroy(gameObject);
 
-            tempObject = Instantiate(transform, transform.position, transform.rotation) as Transform;
-            tempObject.localScale = new Vector3(3.0f, 3.0f, 1.0f);
-            tempObject.gameObject.collider2D.enabled = true;
-            tempObject.rigidbody2D.AddForce(new Vector2(x, y) * magnitude);
-            rigidbody2D.AddTorque(Random.Range(minTorque, maxTorque));
+            GameObject.FindGameObjectWithTag("Game Manager").SendMessage("RemoveAsteroidFromCount");
 
-            tempObject = Instantiate(transform, transform.position + new Vector3(1, 1, 1), transform.rotation) as Transform;
-            tempObject.localScale = new Vector3(3.0f, 3.0f, 1.0f);
-            tempObject.gameObject.collider2D.enabled = true;
-            tempObject.rigidbody2D.AddForce(new Vector2(x, y) * magnitude);
-            rigidbody2D.AddTorque(Random.Range(minTorque, maxTorque));
+            if (childAsteroid != null)
+            {
+                for (int i = 0; i < numChildren; i++)
+                {
+                    int r = Random.Range(-2, 2);
+                    Instantiate(childAsteroid, transform.position + new Vector3(r, r, r), new Quaternion());
+                }
+            }
         }
+
     }
 }
