@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿
+using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -46,21 +47,19 @@ public class AstroidScript : MonoBehaviour
     {
         if (otherObject.gameObject.tag == "bullet")
         {
-            PlayerScript.playerScore += 100;
+            GameObject.FindGameObjectWithTag("Game Manager").SendMessage("UpdatePlayerScore", 100);
 
             Instantiate(explosion, transform.position, transform.rotation);
 
             Destroy(otherObject.gameObject);
             Destroy(gameObject);
 
-            GameObject.FindGameObjectWithTag("Game Manager").SendMessage("RemoveAsteroidFromCount");
-
             if (childAsteroid != null)
             {
                 for (int i = 0; i < numChildren; i++)
                 {
-                    int r = Random.Range(-2, 2);
-                    Instantiate(childAsteroid, transform.position + new Vector3(r, r, r), new Quaternion());
+                    int r = Random.Range(-3, 3);
+                    Instantiate(childAsteroid, transform.position + new Vector3(r, r, 0), new Quaternion());
                 }
             }
         }

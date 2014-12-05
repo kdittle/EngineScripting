@@ -10,10 +10,10 @@ public class PlayerScript : MonoBehaviour
 
 	public float playerSpeed;
 	public float turnSpeed;
-	public static int playerLives;
-    public static bool isAlive;
+	public int playerLives;
+    public bool isAlive;
 
-	public static int playerScore = 0;
+	public int playerScore = 0;
 
 	public Transform explosion;
 
@@ -30,6 +30,13 @@ public class PlayerScript : MonoBehaviour
         {
             Debug.LogException(e, this);
         }
+
+
+        playerLives = 3;
+        playerScore = 0;
+        thruster = transform.FindChild("ShipThruster");
+        thruster.renderer.enabled = false;
+        isAlive = true;
     }
 
 	// Use this for initialization
@@ -47,12 +54,6 @@ public class PlayerScript : MonoBehaviour
         {
             Debug.Log("Game Manager found.");
         }
-
-		playerLives = 3;
-		playerScore = 0;
-	    thruster = transform.FindChild("ShipThruster");
-	    thruster.renderer.enabled = false;
-	    isAlive = true;
 
 	    
 	}
@@ -90,6 +91,11 @@ public class PlayerScript : MonoBehaviour
 
     }
 
+    private void UpdatePlayerStatus()
+    {
+        GameObject.FindGameObjectWithTag("Game Manager").SendMessage("CheckPlayerStatus", isAlive);
+    }
+
     //Collision between player and enemies
     void OnCollisionEnter2D(Collision2D otherObject)
     {
@@ -99,8 +105,9 @@ public class PlayerScript : MonoBehaviour
 
             Destroy(this.gameObject);
 
-            playerLives--;
+            //playerLives--;
             isAlive = false;
+            UpdatePlayerStatus();
         }
 
         if (otherObject.gameObject.tag == "asteroid")
@@ -109,8 +116,9 @@ public class PlayerScript : MonoBehaviour
 
             Destroy(this.gameObject);
 
-            playerLives--;
+            //playerLives--;
             isAlive = false;
+            UpdatePlayerStatus();
         }
     }
 

@@ -11,8 +11,6 @@ public class GameManagerScript : MonoBehaviour
     public GameObject PlayerSpawnObject;
     public GameObject AsteroidSpawnObject;
 
-    private int _asteroidCount = 5;
-
 	// Use this for initialization
 	void Start () 
     {
@@ -24,26 +22,34 @@ public class GameManagerScript : MonoBehaviour
     {
 
         //Win/Lose conditions
-        if (PlayerScript.playerScore >= PointsToWin)
+        if (PlayerObject.GetComponent<PlayerScript>().playerScore >= PointsToWin)
         {
             Application.LoadLevel(3);
         }
 
-        if (PlayerScript.playerLives <= 0)
+        if ((PlayerObject.GetComponent<PlayerScript>().playerLives <= 0))
         {
             Application.LoadLevel(2);
         }
 	}
 
-    public void RemoveAsteroidFromCount()
+    public void CheckPlayerStatus(bool isPlayerAlive)
     {
-        _asteroidCount--;
+        if(!isPlayerAlive)
+        {
+            PlayerObject.GetComponent<PlayerScript>().playerLives--;
+        }
+    }
+
+    public void UpdatePlayerScore(int scoreToAdd)
+    {
+        PlayerObject.GetComponent<PlayerScript>().playerScore += 100;
     }
 
     void OnGUI()
     {
-        GUI.Label(new Rect(10, 10, 200, 50), "Score: " + PlayerScript.playerScore);
+        GUI.Label(new Rect(10, 10, 200, 50), "Score: " + PlayerObject.GetComponent<PlayerScript>().playerScore);
 
-        GUI.Label(new Rect(10, 30, 200, 50), "Lives: " + PlayerScript.playerLives);
+        GUI.Label(new Rect(10, 30, 200, 50), "Lives: " + PlayerObject.GetComponent<PlayerScript>().playerLives);
     }
 }
