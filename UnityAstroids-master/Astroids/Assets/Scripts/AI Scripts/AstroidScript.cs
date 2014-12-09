@@ -7,7 +7,7 @@ public class AstroidScript : MonoBehaviour
 {
     public Transform explosion;
 
-    public GameObject childAsteroid;
+    public GameObject[] childAsteroids;
     public int numChildren = 2;
 
     public float minTorque = 10.0f;
@@ -20,7 +20,7 @@ public class AstroidScript : MonoBehaviour
 
     private Vector2 velocity;
     private float x, y;
-    float magnitude;
+    private float magnitude;
 
     // Use this for initialization
     void Start()
@@ -54,12 +54,29 @@ public class AstroidScript : MonoBehaviour
             Destroy(otherObject.gameObject);
             Destroy(gameObject);
 
-            if (childAsteroid != null)
+            if (childAsteroids[0] != null)
             {
                 for (int i = 0; i < numChildren; i++)
                 {
                     int r = Random.Range(-3, 3);
-                    Instantiate(childAsteroid, transform.position + new Vector3(r, r, 0), new Quaternion());
+                    Instantiate(childAsteroids[Random.Range(0, childAsteroids.Length)], transform.position + new Vector3(r, r, 0), new Quaternion());
+                }
+            }
+        }
+
+        if (otherObject.gameObject.tag == "alienBullet" || otherObject.gameObject.tag == "enemy")
+        {
+            Instantiate(explosion, transform.position, transform.rotation);
+
+            Destroy(otherObject.gameObject);
+            Destroy(gameObject);
+
+            if (childAsteroids[0] != null)
+            {
+                for (int i = 0; i < numChildren; i++)
+                {
+                    int r = Random.Range(-3, 3);
+                    Instantiate(childAsteroids[Random.Range(0, childAsteroids.Length)], transform.position + new Vector3(r, r, 0), new Quaternion());
                 }
             }
         }

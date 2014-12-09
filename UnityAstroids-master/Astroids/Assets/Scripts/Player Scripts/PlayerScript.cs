@@ -124,6 +124,11 @@ public class PlayerScript : MonoBehaviour
         playerLives = 3;
     }
 
+    public void ResetPlayerPosition()
+    {
+        transform.position.Set(0.0f, 0.0f, 0.0f);
+    }
+
     //Collision between player and enemies
     void OnCollisionEnter2D(Collision2D otherObject)
     {
