@@ -10,57 +10,82 @@ public class GameManagerScript : MonoBehaviour
     public GameObject PlayerSpawnObject;
     public GameObject AsteroidSpawnObject;
     public GameObject[] AsteroidList;
+    public GameObject ufoObjcet;
+    public GUIStyle Style;
 
     private bool _spawnSafe;
     private bool _isPlayerDead;
 
-    private int _intialAsteroidCount = 1;
+    private int _intialAsteroidCount = 4;
     private int _curAsteroidCount = 0;
+    private float _UFOspawnTimer = 5.0f;
+    private int _curUFOCount = 0;
+    private int _maxUFOCount = 2;
 
     private int _level = 1;
+    private int _highScore = 0;
     private bool _winDisplay = false;
     private bool _loseDisplay = false;
+    private bool _pauseGame = false;
 
     // Use this for initialization
     void Start()
     {
+        //don;t destroy the game manager. IT needs to stick around
         DontDestroyOnLoad(gameObject);
-        PlayerObject.GetComponent<PlayerScript>().ResetPlayer();
+        PlayerObject.GetComponent<PlayerScript>().ResetPlayer(); //reset the player each time a new game is started
         _isPlayerDead = false;
         _winDisplay = false;
         _loseDisplay = false;
+        _pauseGame = false;
 
-        _intialAsteroidCount = 5;
+        _intialAsteroidCount = 4;
         _curAsteroidCount = 0;
+        _highScore = 0;
+        _UFOspawnTimer = 5.0f;
 
+        //spawn asteroids
         SetUpAsteroids();
     }
 
     // Update is called once per frame
     void FixedUpdate()
     {
-        
-        if (_isPlayerDead && PlayerSpawnObject.GetComponent<PlayerSpawnScript>().CheckSpawnStatus())
+        if (!_pauseGame)
         {
-            RespawnPlayer();
-        }
+            _UFOspawnTimer -= Time.deltaTime;
 
-        Debug.Log(_curAsteroidCount);
+            if (_UFOspawnTimer <= 0 && GameObject.FindGameObjectWithTag("enemy") == null
+                && _curUFOCount < _maxUFOCount)
+            {
+                SpawnUFO();
+                _UFOspawnTimer = 5.0f;
+            }
 
-        //Win/Lose conditions
-        if (_curAsteroidCount <= 0)
-        {
-            _winDisplay = true;
-        }
+            //respawn player if he is dead
+            if (_isPlayerDead && PlayerSpawnObject.GetComponent<PlayerSpawnScript>().CheckSpawnStatus())
+            {
+                RespawnPlayer();
+            }
 
-        if ((PlayerObject.GetComponent<PlayerScript>().GetPlayerLives() <= 0))
-        {
-            _loseDisplay = false;
+            //Win/Lose conditions
+            if (_curAsteroidCount <= 0)
+            {
+                _winDisplay = true;
+                _pauseGame = true;
+            }
+
+            if ((PlayerObject.GetComponent<PlayerScript>().GetPlayerLives() < 0))
+            {
+                _loseDisplay = true;
+                _pauseGame = true;
+            }
         }
     }
 
     void SetUpAsteroids()
     {
+        //sets up the asteroids
         for (int i = 0; i < _intialAsteroidCount; i++)
         {
             SpawnAsteroids();
@@ -71,53 +96,123 @@ public class GameManagerScript : MonoBehaviour
 
     void SpawnAsteroids()
     {
+        //randomly spawn the asteroids
+        float x = Random.Range(-20, 20);
+        float y = Random.Range(-15, 15);
+        Vector2 tempPos = new Vector2(x, y);
+
+        //check the distance from the player, keepds them from spawning too close to thep player
+        if (Vector2.Distance(PlayerObject.transform.position, tempPos) > 5)
+            Instantiate(AsteroidList[Random.Range(0, AsteroidList.Length)], tempPos, new Quaternion());
+        else
+            SpawnAsteroids(); //if they are too close to the player, just call the method again and again.
+    }
+
+    private void SpawnUFO()
+    {
         float x = Random.Range(-20, 20);
         float y = Random.Range(-15, 15);
         Vector2 tempPos = new Vector2(x, y);
 
         if (Vector2.Distance(PlayerObject.transform.position, tempPos) > 5)
-            Instantiate(AsteroidList[Random.Range(0, AsteroidList.Length)], tempPos, new Quaternion());
+        {
+            Instantiate(ufoObjcet, tempPos, new Quaternion());
+            _curUFOCount++;
+        }
         else
-            SpawnAsteroids();
+            SpawnUFO();
     }
 
+    public void RemoveUFO()
+    {
+        _curUFOCount--;
+    }
+
+    public void UpdateAsteroidCount(int countMod)
+    {
+        //updates the number of asteroids on the screen
+        _curAsteroidCount += countMod;
+    }
+
+    //check if the palyer is alive or dead
     public void CheckPlayerStatus(bool isPlayerAlive)
     {
         if (!isPlayerAlive)
         {
             _isPlayerDead = true;
+            //if player dies, remove a life
             PlayerObject.GetComponent<PlayerScript>().RemovePlayerLife();
         }
     }
 
+    //updates the player score
     public void UpdatePlayerScore(int scoreToAdd)
     {
         PlayerObject.GetComponent<PlayerScript>().AddToScore(scoreToAdd);
+        _highScore = PlayerObject.GetComponent<PlayerScript>().GetPlayerScore();
     }
 
+    //respawn the player
     public void RespawnPlayer()
     {
         Instantiate(PlayerObject);
         _isPlayerDead = false;
     }
 
+    //handles starting the next level
     private void StartNextLevel()
     {
         _level++;
         _intialAsteroidCount++;
         _curAsteroidCount = 0;
+
         PlayerObject.GetComponent<PlayerScript>().ResetPlayerPosition();
+
+        //clean up all the explosion prefabs that stick around
+        foreach (GameObject obj in GameObject.FindGameObjectsWithTag("explosion"))
+        {
+            Destroy(obj);
+        }
 
         _winDisplay = false;
         _loseDisplay = false;
+        _pauseGame = false;
         SetUpAsteroids();
+    }
+
+    private void KeepPlaying()
+    {
+        _curAsteroidCount = 0;
+
+        foreach (GameObject obj in GameObject.FindGameObjectsWithTag("asteroid"))
+        {
+            Destroy(obj.gameObject);
+        }
+
+        PlayerObject.GetComponent<PlayerScript>().ResetPlayerPosition();
+        PlayerObject.GetComponent<PlayerScript>().ResetPlayerLives();
+        PlayerObject.GetComponent<PlayerScript>().ResetPlayerScore();
+        _winDisplay = false;
+        _loseDisplay = false;
+        SetUpAsteroids();
+
+        foreach (GameObject obj in GameObject.FindGameObjectsWithTag("explosion"))
+        {
+            Destroy(obj);
+        }
+
+        _pauseGame = false;
     }
 
     void OnGUI()
     {
-        GUI.Label(new Rect(10, 10, 200, 50), "Score: " + PlayerObject.GetComponent<PlayerScript>().GetPlayerScore());
 
-        GUI.Label(new Rect(10, 30, 200, 50), "Lives: " + PlayerObject.GetComponent<PlayerScript>().GetPlayerLives());
+        //display stuffs
+        GUI.Label(new Rect(10, 10, 200, 50), "Score: " + PlayerObject.GetComponent<PlayerScript>().GetPlayerScore(), Style);
+
+        GUI.Label(new Rect(10, 30, 200, 50), "Lives: " + PlayerObject.GetComponent<PlayerScript>().GetPlayerLives(), Style);
+
+        GUI.Label(new Rect(Screen.width / 2, 0, 200, 100), "High Score: " + _highScore, Style);
 
         if(_winDisplay)
         {
@@ -126,8 +221,13 @@ public class GameManagerScript : MonoBehaviour
                 Destroy(obj.gameObject);
             }
 
-            GUI.Label(new Rect(Screen.width / 2 + 50, Screen.height / 2 - 50, 200, 50), "You Win!");
-            if (GUI.Button(new Rect(Screen.width / 2, Screen.height / 2, 200, 50), "Next Level"))
+            foreach (GameObject obj in GameObject.FindGameObjectsWithTag("enemy"))
+            {
+                Destroy(obj.gameObject);
+            }
+
+            GUI.Label(new Rect(Screen.width / 2 + 50, Screen.height / 2 - 50, 200, 50), "You Win!", Style);
+            if (GUI.Button(new Rect(Screen.width / 2, Screen.height / 2, 200, 50), "Next Level", Style))
             {
                 StartNextLevel();
             }
@@ -136,7 +236,11 @@ public class GameManagerScript : MonoBehaviour
 
         if(_loseDisplay)
         {
-            GUI.Label(new Rect(10, 10, 200, 50), "You Lose!");
+            GUI.Label(new Rect(Screen.width / 2 + 50, Screen.height / 2 - 50, 200, 50), "You Lose!", Style);
+            if (GUI.Button(new Rect(Screen.width / 2, Screen.height / 2, 200, 50), "Restart", Style))
+            {
+                KeepPlaying();
+            }
         }
     }
 }

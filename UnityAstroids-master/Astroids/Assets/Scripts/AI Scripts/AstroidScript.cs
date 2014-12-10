@@ -25,6 +25,7 @@ public class AstroidScript : MonoBehaviour
     // Use this for initialization
     void Start()
     {
+        //randomly start moving asteroids at the start
         magnitude = Random.Range(minForce, maxForce);
 
         x = Random.Range(-1.0f, 1.0f);
@@ -47,30 +48,45 @@ public class AstroidScript : MonoBehaviour
     {
         if (otherObject.gameObject.tag == "bullet")
         {
+            //find the game manager and send it a message to update the player score
             GameObject.FindGameObjectWithTag("Game Manager").SendMessage("UpdatePlayerScore", 100);
 
+            //create the explosion
             Instantiate(explosion, transform.position, transform.rotation);
 
+            //destroy game objects
             Destroy(otherObject.gameObject);
             Destroy(gameObject);
 
+
+            GameObject.FindGameObjectWithTag("Game Manager").SendMessage("UpdateAsteroidCount", -1);
+
+            //split the parent asteroid
             if (childAsteroids[0] != null)
             {
+                //send a message to add 2 asteroids to the count
+                GameObject.FindGameObjectWithTag("Game Manager").SendMessage("UpdateAsteroidCount", 2);
                 for (int i = 0; i < numChildren; i++)
                 {
                     int r = Random.Range(-3, 3);
                     Instantiate(childAsteroids[Random.Range(0, childAsteroids.Length)], transform.position + new Vector3(r, r, 0), new Quaternion());
+
                 }
             }
+
         }
 
+        //destroy asteroids if they collide with alien bullets or a UFO
         if (otherObject.gameObject.tag == "alienBullet" || otherObject.gameObject.tag == "enemy")
         {
+            //create explosion
             Instantiate(explosion, transform.position, transform.rotation);
 
+            //destory game objects
             Destroy(otherObject.gameObject);
             Destroy(gameObject);
 
+            //create children asteroids (split the initial asteroid)
             if (childAsteroids[0] != null)
             {
                 for (int i = 0; i < numChildren; i++)

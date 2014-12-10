@@ -50,11 +50,12 @@ public class EnemyScript : MonoBehaviour
 
     private void ShootAtPlayer()
     {
-        float angle = Mathf.Atan2(GameObject.FindGameObjectWithTag("Player").transform.position.y - transform.position.y,
-            GameObject.FindGameObjectWithTag("Player").transform.position.x - transform.position.x) * Mathf.Rad2Deg;
+        float angle = (Mathf.Atan2(GameObject.FindGameObjectWithTag("Player").transform.position.y - transform.position.y,
+            GameObject.FindGameObjectWithTag("Player").transform.position.x - transform.position.x) - Mathf.PI / 2 ) * Mathf.Rad2Deg;
 
+        Debug.Log(GameObject.FindGameObjectWithTag("Player").transform.position);
 
-        Instantiate(bullet, transform.position, Quaternion.Euler(new Vector3(0.0f, 0.0f, angle)));
+        Instantiate(bullet, transform.GetChild(0).transform.position, Quaternion.Euler(new Vector3(0.0f, 0.0f, angle)));
     }
 
     void OnCollisionEnter2D(Collision2D otherObject)
@@ -62,6 +63,7 @@ public class EnemyScript : MonoBehaviour
         if (otherObject.gameObject.tag == "bullet")
         {
             GameObject.FindGameObjectWithTag("Game Manager").SendMessage("UpdatePlayerScore", 100);
+            GameObject.FindGameObjectWithTag("Game Manager").SendMessage("RemoveUFO");
 
             Instantiate(explosion, transform.position, transform.rotation);
 
@@ -72,6 +74,7 @@ public class EnemyScript : MonoBehaviour
         if (otherObject.gameObject.tag == "asteroid")
         {
             Instantiate(explosion, transform.position, transform.rotation);
+            GameObject.FindGameObjectWithTag("Game Manager").SendMessage("RemoveUFO");
 
             Destroy(gameObject);
         }

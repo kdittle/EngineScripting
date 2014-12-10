@@ -129,6 +129,16 @@ public class PlayerScript : MonoBehaviour
         transform.position.Set(0.0f, 0.0f, 0.0f);
     }
 
+    public void ResetPlayerLives()
+    {
+        playerLives = 3;
+    }
+
+    public void ResetPlayerScore()
+    {
+        playerScore = 0;
+    }
+
     //Collision between player and enemies
     void OnCollisionEnter2D(Collision2D otherObject)
     {
@@ -144,6 +154,16 @@ public class PlayerScript : MonoBehaviour
         }
 
         if (otherObject.gameObject.tag == "asteroid")
+        {
+            Instantiate(explosion, transform.position, transform.rotation);
+
+            Destroy(gameObject);
+
+            isAlive = false;
+            UpdatePlayerStatus();
+        }
+
+        if (otherObject.gameObject.tag == "alienBullet")
         {
             Instantiate(explosion, transform.position, transform.rotation);
 
