@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System;
-using UnityEditor;
+//using UnityEditor;
 
 public class BulletController : MonoBehaviour
 {
