@@ -116,10 +116,34 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-	<data name="Hello" xml:space="preserve">
-		<value>Hello</value>
+	<data name="Come closer, I have something to tell you." xml:space="preserve">
+		<value>Come closer, I have somethign to tell you</value>
 	</data>
-	<data name="Welcome" xml:space="preserve">
-		<value>Welcome</value>
+	<data name="Goodbye." xml:space="preserve">
+		<value>Goodbye.</value>
+	</data>
+	<data name="Hello there." xml:space="preserve">
+		<value>Hello there.</value>
+	</data>
+	<data name="Hi." xml:space="preserve">
+		<value>Hi.</value>
+	</data>
+	<data name="I'm aware of that." xml:space="preserve">
+		<value>I'm aware of that.</value>
+	</data>
+	<data name="Just checking." xml:space="preserve">
+		<value>Just checking.</value>
+	</data>
+	<data name="This is conversation." xml:space="preserve">
+		<value>This is conversation.</value>
+	</data>
+	<data name="Uhh...bye." xml:space="preserve">
+		<value>Uhh...bye.</value>
+	</data>
+	<data name="Well, ok." xml:space="preserve">
+		<value>Well, ok.</value>
+	</data>
+	<data name="What is it?" xml:space="preserve">
+		<value>What is it?</value>
 	</data>
 </root>
