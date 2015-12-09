@@ -3,6 +3,12 @@
   <version>0</version>
   <CultureInfos>
     <CultureInfo>
+      <languageCode>ar</languageCode>
+      <englishName>Arabic</englishName>
+      <nativeName>العربية</nativeName>
+      <isRightToLeft>true</isRightToLeft>
+    </CultureInfo>
+    <CultureInfo>
       <languageCode>en</languageCode>
       <englishName>English</englishName>
       <nativeName>English</nativeName>

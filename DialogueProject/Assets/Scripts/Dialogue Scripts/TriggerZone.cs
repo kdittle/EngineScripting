@@ -5,12 +5,20 @@ using System.Collections.Generic;
 
 public class TriggerZone : MonoBehaviour
 {
-    private Canvas _worldCanvas;
+	[System.Serializable]
+	public class DialogueInfo
+	{
+		string m_dialogText;
+		AudioClip m_dialogAudio;
+		bool m_skippable;
+	};
+
+	public DialogueInfo[] m_dialogueEnteries;
+
+    public Canvas _worldCanvas;
 
     public List<string> NPCDialogue;
     public List<string> CharDialogue;
-
-    private LocalizationManager LM;
 
     private Text DialogueTXT;
 
@@ -21,37 +29,31 @@ public class TriggerZone : MonoBehaviour
     private bool _CharTalking;
     private GameObject m_NPCObject;
     private GameObject m_PlayerObject;
-
+	private bool _bConversationFinished;
 
     // Use this for initialization
     void Start()
     {
-        SmartLocalization.LanguageManager.Instance.ChangeLanguage("sv");
-
-        //Get the LocalizationManager
-        LM = GameObject.FindGameObjectWithTag("Manager").GetComponent<LocalizationManager>();
+		_bConversationFinished = false;
+        //SmartLocalization.LanguageManager.Instance.ChangeLanguage("sv");
 
         //Add NPC dialogue
-        foreach (string s in LM.m_NPCDialogue)
+        foreach (string s in LocalizationManager.Instance.m_NPCDialogue)
         {
             NPCDialogue.Add(s);
         }
 
         //Add Char dialogue
-        foreach (string s in LM.m_CharDialogue)
+        foreach (string s in LocalizationManager.Instance.m_CharDialogue)
         {
             CharDialogue.Add(s);
         }
 
         //Find the two canvas objects
         //Canvas objects should be turned off by default in editor so they don't appear on screen
-        _worldCanvas = GameObject.FindGameObjectWithTag("WPDialogueCanvas").GetComponent<Canvas>();
 
         //Find the NPC that's going to be talking
         m_NPCObject = GameObject.FindGameObjectWithTag("AI");
-
-        //Find the player
-        m_PlayerObject = GameObject.FindGameObjectWithTag("Player");
 
         //Set the current NPCDialogue to 0, so the first sentence may be displayed
         _curNPCDialogue = 0;
@@ -72,11 +74,14 @@ public class TriggerZone : MonoBehaviour
 
         //Get input to change NPCDialogue
         //Should be handled in a player script and use messaging to change NPCDialogue. Maybe?
-        if ((_curCharDialogue < CharDialogue.Capacity && Input.GetKeyDown(KeyCode.Space)) || (_curNPCDialogue < NPCDialogue.Capacity) && Input.GetKeyDown(KeyCode.Space))
+        if ((_curCharDialogue < CharDialogue.Count && Input.GetKeyDown(KeyCode.Space)) || (_curNPCDialogue < NPCDialogue.Count) && Input.GetKeyDown(KeyCode.Space))
         {
             SwitchDialogue();
             m_NPCObject.gameObject.GetComponent<AudioSource>().Play();
         }
+
+		if (_bConversationFinished)
+			m_NPCObject.GetComponent<NPCMovement> ()._NPCState = NPCMovement.NPCState.Walking;
     }
 
     void OnTriggerEnter(Collider other)
@@ -85,19 +90,19 @@ public class TriggerZone : MonoBehaviour
         //Check to see if it's the player that entered the zone
         if (other.gameObject.tag == "Player")
         {
-            m_PlayerObject.GetComponent<PlayerMovementScript>().m_PlayerState = PlayerMovementScript.PState.Talking;
+			if(!_bConversationFinished)
+			{
+            	other.GetComponent<PlayerMovementScript>().m_PlayerState = PlayerMovementScript.PState.Talking;
 
-            _curNPCDialogue = 0;
-            _curCharDialogue = 0;
+            	//Spawn the NPCDialogue box above the AI character
+            	_worldCanvas.gameObject.transform.position = new Vector3(m_NPCObject.transform.position.x, m_NPCObject.transform.position.y + 2, m_NPCObject.transform.position.z);
 
-            //Spawn the NPCDialogue box above the AI character
-            _worldCanvas.gameObject.transform.position = new Vector3(m_NPCObject.transform.position.x, m_NPCObject.transform.position.y + 2, m_NPCObject.transform.position.z);
-
-            //enable the proper canvas
-            _worldCanvas.enabled = true;
-            DialogueTXT = _worldCanvas.GetComponentInChildren<Text>();
-            SwitchDialogue();
-            m_NPCObject.gameObject.GetComponent<AudioSource>().Play();
+            	//enable the proper canvas
+            	_worldCanvas.enabled = true;
+            	DialogueTXT = _worldCanvas.GetComponentInChildren<Text>();
+            	SwitchDialogue();
+            	m_NPCObject.gameObject.GetComponent<AudioSource>().Play();
+			}
         }
     }
 
@@ -108,7 +113,7 @@ public class TriggerZone : MonoBehaviour
         {
             if (!_NPCTalking)
             {
-                if (_curNPCDialogue <= NPCDialogue.Capacity)
+                if (_curNPCDialogue <= NPCDialogue.Count)
                 {
                     _worldCanvas.gameObject.transform.position = new Vector3(m_NPCObject.transform.position.x, m_NPCObject.transform.position.y + 2, m_NPCObject.transform.position.z);
                 }
@@ -117,15 +122,15 @@ public class TriggerZone : MonoBehaviour
             //If the character is talking, display the character text
             if (!_CharTalking)
             {
-                if (_curCharDialogue <= CharDialogue.Capacity)
+                if (_curCharDialogue <= CharDialogue.Count)
                 {
-                    _worldCanvas.gameObject.transform.position = new Vector3(m_PlayerObject.transform.position.x, m_PlayerObject.transform.position.y + 2, m_PlayerObject.transform.position.z);
+                    _worldCanvas.gameObject.transform.position = new Vector3(other.transform.position.x, other.transform.position.y + 2, other.transform.position.z);
                 }
             }
 
             //Really bad solution for displaying the final exchange of dialgoue
             //Works for now.
-            if (_curNPCDialogue >= NPCDialogue.Capacity && _curCharDialogue >= CharDialogue.Capacity)
+            if (_curNPCDialogue >= NPCDialogue.Count && _curCharDialogue >= CharDialogue.Count)
             {
                 if (Input.GetKeyDown(KeyCode.Space))
                 {
@@ -135,8 +140,11 @@ public class TriggerZone : MonoBehaviour
             }
         }
 
-        if(!_worldCanvas.enabled)
-            m_PlayerObject.GetComponent<PlayerMovementScript>().m_PlayerState = PlayerMovementScript.PState.Idle;
+        if (!_worldCanvas.enabled) 
+		{
+			other.GetComponent<PlayerMovementScript> ().m_PlayerState = PlayerMovementScript.PState.Idle;
+			_bConversationFinished = true;
+		}
     }
 
     //When player exits
@@ -153,8 +161,8 @@ public class TriggerZone : MonoBehaviour
     {
         //If the NPC is talking, display the NPC text
         if (_NPCTalking)
-        {
-            if (_curNPCDialogue < NPCDialogue.Capacity)
+		{
+            if (_curNPCDialogue < NPCDialogue.Count)
             {
                 DialogueTXT.text = NPCDialogue[_curNPCDialogue].ToString();
             }
@@ -166,7 +174,7 @@ public class TriggerZone : MonoBehaviour
         //If the character is talking, display the character text
         if (_CharTalking)
         {
-            if (_curCharDialogue < CharDialogue.Capacity)
+            if (_curCharDialogue < CharDialogue.Count)
             {
                 DialogueTXT.text = CharDialogue[_curCharDialogue].ToString();
             }

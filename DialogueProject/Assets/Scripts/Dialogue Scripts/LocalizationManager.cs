@@ -13,17 +13,31 @@ public class LocalizationManager : MonoBehaviour
     private System.IO.StreamReader file;
     private string line;
 
+	private static LocalizationManager s_Instance = null;
+	public static LocalizationManager Instance
+	{
+		get
+		{
+			if(s_Instance == null)
+			{
+				s_Instance = FindObjectOfType(typeof(LocalizationManager)) as LocalizationManager;
+			}
+			return s_Instance;
+		}
+	}
+
 	// Use this for initialization
 	void Start ()
     {
         //get the current culture
         p_SystemCultureInfo = CultureInfo.CurrentCulture;
 
-        //LanguageManager.Instance.ChangeLanguage("sv");
+		//Automatically set the language to the default system language
+        //LanguageManager.Instance.ChangeLanguage(p_SystemCultureInfo.ToString());
 
         //Load the dialogue
         //Start with NPC Dialogue file
-        file = new System.IO.StreamReader(@"C:\Users\Kyle\Desktop\EngineScripting\DialogueProject\Assets\NPCDialogue.txt");
+		file = new System.IO.StreamReader (@"Assets/NPCDialogue.txt");	//Yay, no long file path
 
         while((line = file.ReadLine()) != null)
         {
@@ -31,7 +45,7 @@ public class LocalizationManager : MonoBehaviour
         }
 
         //Next to player dialogue
-        file = new System.IO.StreamReader(@"C:\Users\Kyle\Desktop\EngineScripting\DialogueProject\Assets\PlayerDialogue.txt");
+		file = new System.IO.StreamReader(@"Assets/PlayerDialogue.txt");	//Yay, another not so long file path
 
         while((line = file.ReadLine()) != null)
         {
