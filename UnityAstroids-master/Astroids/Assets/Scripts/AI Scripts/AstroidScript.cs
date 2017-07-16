@@ -31,10 +31,10 @@ public class AstroidScript : MonoBehaviour
         x = Random.Range(-1.0f, 1.0f);
         y = Random.Range(-1.0f, 1.0f);
 
-        rigidbody2D.AddForce(new Vector2(x, y) * magnitude);
+        GetComponent<Rigidbody2D>().AddForce(new Vector2(x, y) * magnitude);
 
 
-        rigidbody2D.AddTorque(Random.Range(minTorque, maxTorque));
+        GetComponent<Rigidbody2D>().AddTorque(Random.Range(minTorque, maxTorque));
 
     }
 

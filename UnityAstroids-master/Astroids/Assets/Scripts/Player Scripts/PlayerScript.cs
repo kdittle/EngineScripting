@@ -31,8 +31,8 @@ public class PlayerScript : MonoBehaviour
 
         playerLives = 3;
         playerScore = 0;
-        thruster = transform.FindChild("ShipThruster");
-        thruster.renderer.enabled = false;
+        thruster = transform.Find("ShipThruster");
+        thruster.GetComponent<Renderer>().enabled = false;
         isAlive = true;
     }
 
@@ -54,8 +54,8 @@ public class PlayerScript : MonoBehaviour
 
         playerLives = 3;
         playerScore = 0;
-        thruster = transform.FindChild("ShipThruster");
-        thruster.renderer.enabled = false;
+        thruster = transform.Find("ShipThruster");
+        thruster.GetComponent<Renderer>().enabled = false;
         isAlive = true;
 	    
 	}
@@ -73,22 +73,22 @@ public class PlayerScript : MonoBehaviour
         //move player
         if (Input.GetKey(KeyCode.UpArrow) || Input.GetKey(KeyCode.W))
         {
-            rigidbody2D.AddRelativeForce(Vector2.up * playerSpeed, ForceMode2D.Force);
-            thruster.renderer.enabled = true;
+            GetComponent<Rigidbody2D>().AddRelativeForce(Vector2.up * playerSpeed, ForceMode2D.Force);
+            thruster.GetComponent<Renderer>().enabled = true;
         }
         else
         {
-            thruster.renderer.enabled = false;
+            thruster.GetComponent<Renderer>().enabled = false;
         }
 
         if (Input.GetKey(KeyCode.RightArrow) || Input.GetKey(KeyCode.D))
         {
-            rigidbody2D.AddTorque(1.0f * -turnSpeed, ForceMode2D.Force);
+            GetComponent<Rigidbody2D>().AddTorque(1.0f * -turnSpeed, ForceMode2D.Force);
         }
 
         if (Input.GetKey(KeyCode.LeftArrow) || Input.GetKey(KeyCode.A))
         {
-            rigidbody2D.AddTorque(1.0f * turnSpeed, ForceMode2D.Force);
+            GetComponent<Rigidbody2D>().AddTorque(1.0f * turnSpeed, ForceMode2D.Force);
         }
 
     }

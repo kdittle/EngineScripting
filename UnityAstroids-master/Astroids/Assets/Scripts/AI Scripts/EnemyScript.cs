@@ -45,7 +45,7 @@ public class EnemyScript : MonoBehaviour
         float _y = Random.Range(-1, 1);
 
 
-        rigidbody2D.AddForce(new Vector2(_x, _y) * Random.Range(minForce, maxForce));
+        GetComponent<Rigidbody2D>().AddForce(new Vector2(_x, _y) * Random.Range(minForce, maxForce));
     }
 
     private void ShootAtPlayer()
