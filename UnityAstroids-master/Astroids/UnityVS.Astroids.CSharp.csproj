@@ -75,12 +75,10 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\Scripts\AI Scripts\Asteroid.cs" />
     <Compile Include="Assets\Scripts\AI Scripts\AstroidScript.cs" />
     <Compile Include="Assets\Scripts\AI Scripts\EnemyScript.cs" />
     <Compile Include="Assets\Scripts\Bullet Scripts\BulletController.cs" />
     <Compile Include="Assets\Scripts\Bullet Scripts\BulletScript.cs" />
-    <Compile Include="Assets\Scripts\Game Manager Scripts\GameManager.cs" />
     <Compile Include="Assets\Scripts\Game Manager Scripts\GameManagerScript.cs" />
     <Compile Include="Assets\Scripts\Player Scripts\PlayerScript.cs" />
     <Compile Include="Assets\Scripts\Player Scripts\PlayerSpawnScript.cs" />

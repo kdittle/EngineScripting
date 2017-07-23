@@ -15,6 +15,7 @@ public class GameManagerScript : MonoBehaviour
 
     private bool _spawnSafe;
     private bool _isPlayerDead;
+    private PlayerScript playerScript;
 
     private int _intialAsteroidCount = 4;
     private int _curAsteroidCount = 0;
@@ -28,12 +29,26 @@ public class GameManagerScript : MonoBehaviour
     private bool _loseDisplay = false;
     private bool _pauseGame = false;
 
+    private static GameManagerScript s_instance = null;
+
+    public static GameManagerScript Instance
+    {
+        get
+        {
+            if (s_instance == null)
+                s_instance = FindObjectOfType(typeof(GameManagerScript)) as GameManagerScript;
+
+                return s_instance;
+        }
+    }
+
     // Use this for initialization
     void Start()
     {
         //don;t destroy the game manager. IT needs to stick around
         DontDestroyOnLoad(gameObject);
-        PlayerObject.GetComponent<PlayerScript>().ResetPlayer(); //reset the player each time a new game is started
+        playerScript = PlayerObject.GetComponent<PlayerScript>();
+        playerScript.ResetPlayer(); //reset the player each time a new game is started
         _isPlayerDead = false;
         _winDisplay = false;
         _loseDisplay = false;
@@ -75,7 +90,7 @@ public class GameManagerScript : MonoBehaviour
                 _pauseGame = true;
             }
 
-            if ((PlayerObject.GetComponent<PlayerScript>().GetPlayerLives() < 0))
+            if ((playerScript.GetPlayerLives() < 0))
             {
                 _loseDisplay = true;
                 _pauseGame = true;
@@ -141,15 +156,15 @@ public class GameManagerScript : MonoBehaviour
         {
             _isPlayerDead = true;
             //if player dies, remove a life
-            PlayerObject.GetComponent<PlayerScript>().RemovePlayerLife();
+            playerScript.RemovePlayerLife();
         }
     }
 
     //updates the player score
     public void UpdatePlayerScore(int scoreToAdd)
     {
-        PlayerObject.GetComponent<PlayerScript>().AddToScore(scoreToAdd);
-        _highScore = PlayerObject.GetComponent<PlayerScript>().GetPlayerScore();
+        playerScript.AddToScore(scoreToAdd);
+        _highScore = playerScript.GetPlayerScore();
     }
 
     //respawn the player
@@ -166,7 +181,7 @@ public class GameManagerScript : MonoBehaviour
         _intialAsteroidCount++;
         _curAsteroidCount = 0;
 
-        PlayerObject.GetComponent<PlayerScript>().ResetPlayerPosition();
+        playerScript.ResetPlayerPosition();
 
         //clean up all the explosion prefabs that stick around
         foreach (GameObject obj in GameObject.FindGameObjectsWithTag("explosion"))
@@ -189,9 +204,9 @@ public class GameManagerScript : MonoBehaviour
             Destroy(obj.gameObject);
         }
 
-        PlayerObject.GetComponent<PlayerScript>().ResetPlayerPosition();
-        PlayerObject.GetComponent<PlayerScript>().ResetPlayerLives();
-        PlayerObject.GetComponent<PlayerScript>().ResetPlayerScore();
+        playerScript.ResetPlayerPosition();
+        playerScript.ResetPlayerLives();
+        playerScript.ResetPlayerScore();
         _winDisplay = false;
         _loseDisplay = false;
         SetUpAsteroids();
@@ -208,9 +223,9 @@ public class GameManagerScript : MonoBehaviour
     {
 
         //display stuffs
-        GUI.Label(new Rect(10, 10, 200, 50), "Score: " + PlayerObject.GetComponent<PlayerScript>().GetPlayerScore(), Style);
+        GUI.Label(new Rect(10, 10, 200, 50), "Score: " + playerScript.GetPlayerScore(), Style);
 
-        GUI.Label(new Rect(10, 30, 200, 50), "Lives: " + PlayerObject.GetComponent<PlayerScript>().GetPlayerLives(), Style);
+        GUI.Label(new Rect(10, 30, 200, 50), "Lives: " + playerScript.GetPlayerLives(), Style);
 
         GUI.Label(new Rect(Screen.width / 2, 0, 200, 100), "High Score: " + _highScore, Style);
 

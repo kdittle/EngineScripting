@@ -5,8 +5,6 @@ using System.Collections;
 
 public class PlayerScript : MonoBehaviour 
 {
-    public GameObject gameManager;
-    public GameManagerScript gmScript;
     public Transform explosion;
 	public float playerSpeed;
 	public float turnSpeed;
@@ -14,48 +12,18 @@ public class PlayerScript : MonoBehaviour
 	private int playerLives;
     private bool isAlive;
 	private int playerScore = 0;
-    private Transform thruster;
-
-    //Try and find the game manager
-    void Awake()
-    {
-        try
-        {
-            gmScript = GameObject.FindGameObjectWithTag("Game Manager").GetComponent<GameManagerScript>();
-        }
-        catch (Exception e)
-        {
-            Debug.LogException(e, this);
-        }
-
-
-        playerLives = 3;
-        playerScore = 0;
-        thruster = transform.Find("ShipThruster");
-        thruster.GetComponent<Renderer>().enabled = false;
-        isAlive = true;
-    }
+    public Transform thruster;
+    private Renderer thrusterRendercmp;
+    private Rigidbody2D rgdBody2D;
 
 	// Use this for initialization
 	void Start () 
 	{
-        //find or create the game manager!
-        if (gmScript == null)
-        {
-            Debug.Log("There is no Game Manager");
-            Debug.Log("Creating Game Manager");
-            Instantiate(gameManager);
-
-        }
-        else
-        {
-            Debug.Log("Game Manager found.");
-        }
-
         playerLives = 3;
         playerScore = 0;
-        thruster = transform.Find("ShipThruster");
-        thruster.GetComponent<Renderer>().enabled = false;
+        thrusterRendercmp = thruster.GetComponent<Renderer>();
+        thrusterRendercmp.enabled = false;
+        rgdBody2D = GetComponent<Rigidbody2D>();
         isAlive = true;
 	    
 	}
@@ -73,29 +41,34 @@ public class PlayerScript : MonoBehaviour
         //move player
         if (Input.GetKey(KeyCode.UpArrow) || Input.GetKey(KeyCode.W))
         {
-            GetComponent<Rigidbody2D>().AddRelativeForce(Vector2.up * playerSpeed, ForceMode2D.Force);
-            thruster.GetComponent<Renderer>().enabled = true;
+            rgdBody2D.AddRelativeForce(Vector2.up * playerSpeed, ForceMode2D.Force);
+            thrusterRendercmp.enabled = true;
         }
         else
         {
-            thruster.GetComponent<Renderer>().enabled = false;
+            thrusterRendercmp.enabled = false;
         }
 
         if (Input.GetKey(KeyCode.RightArrow) || Input.GetKey(KeyCode.D))
         {
-            GetComponent<Rigidbody2D>().AddTorque(1.0f * -turnSpeed, ForceMode2D.Force);
+            rgdBody2D.AddTorque(1.0f * -turnSpeed, ForceMode2D.Force);
         }
 
         if (Input.GetKey(KeyCode.LeftArrow) || Input.GetKey(KeyCode.A))
         {
-            GetComponent<Rigidbody2D>().AddTorque(1.0f * turnSpeed, ForceMode2D.Force);
+            rgdBody2D.AddTorque(1.0f * turnSpeed, ForceMode2D.Force);
         }
 
     }
 
     private void UpdatePlayerStatus()
     {
-        GameObject.FindGameObjectWithTag("Game Manager").SendMessage("CheckPlayerStatus", isAlive);
+        GameManagerScript.Instance.CheckPlayerStatus(isAlive);
+    }
+
+    public bool isPlayerAlive()
+    {
+        return isAlive;
     }
 
     public int GetPlayerScore()

@@ -12,12 +12,17 @@ public class EnemyScript : MonoBehaviour
     public float minForce = -100;
     public float maxForce = 100;
 
+    private GameObject playerRef;
+    private PlayerScript playerRefScript;
+
 	// Use this for initialization
 	void Start () 
 	{
         Move();
         _timeToChangeDirection = 5.0f;
         _shootInterval = 2.0f;
+        playerRef = GameObject.FindGameObjectWithTag("Player");
+        playerRefScript = playerRef.GetComponent<PlayerScript>();
 	}
 	
 	// Update is called once per frame
@@ -31,11 +36,14 @@ public class EnemyScript : MonoBehaviour
         }
 
         _shootInterval -= Time.deltaTime;
-        if(Vector2.Distance(GameObject.FindGameObjectWithTag("Player").transform.position, transform.position) <= 35.0f 
-            && _shootInterval <= 0)
+        if (playerRefScript.isPlayerAlive())
         {
-            ShootAtPlayer();
-            _shootInterval = 2.0f;
+            if (Vector2.Distance(playerRef.transform.position, transform.position) <= 35.0f
+                && _shootInterval <= 0)
+            {
+                ShootAtPlayer();
+                _shootInterval = 2.0f;
+            }
         }
 	}
 
@@ -50,10 +58,10 @@ public class EnemyScript : MonoBehaviour
 
     private void ShootAtPlayer()
     {
-        float angle = (Mathf.Atan2(GameObject.FindGameObjectWithTag("Player").transform.position.y - transform.position.y,
-            GameObject.FindGameObjectWithTag("Player").transform.position.x - transform.position.x) - Mathf.PI / 2 ) * Mathf.Rad2Deg;
+        float angle = (Mathf.Atan2(playerRef.transform.position.y - transform.position.y,
+            playerRef.transform.position.x - transform.position.x) - Mathf.PI / 2 ) * Mathf.Rad2Deg;
 
-        Debug.Log(GameObject.FindGameObjectWithTag("Player").transform.position);
+        Debug.Log(playerRef.transform.position);
 
         Instantiate(bullet, transform.GetChild(0).transform.position, Quaternion.Euler(new Vector3(0.0f, 0.0f, angle)));
     }
@@ -62,8 +70,8 @@ public class EnemyScript : MonoBehaviour
     {
         if (otherObject.gameObject.tag == "bullet")
         {
-            GameObject.FindGameObjectWithTag("Game Manager").SendMessage("UpdatePlayerScore", 100);
-            GameObject.FindGameObjectWithTag("Game Manager").SendMessage("RemoveUFO");
+            GameManagerScript.Instance.UpdatePlayerScore(100);
+            GameManagerScript.Instance.RemoveUFO();
 
             Instantiate(explosion, transform.position, transform.rotation);
 
@@ -74,7 +82,7 @@ public class EnemyScript : MonoBehaviour
         if (otherObject.gameObject.tag == "asteroid")
         {
             Instantiate(explosion, transform.position, transform.rotation);
-            GameObject.FindGameObjectWithTag("Game Manager").SendMessage("RemoveUFO");
+            GameManagerScript.Instance.RemoveUFO();
 
             Destroy(gameObject);
         }
